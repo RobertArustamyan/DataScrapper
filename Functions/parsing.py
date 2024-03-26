@@ -1,28 +1,7 @@
-from fake_useragent import UserAgent
 import json
+import concurrent.futures
 import requests
-from bs4 import BeautifulSoup
-
-
-
-# response = requests.post(
-#     'https://banali.am/api/search/filter-posts',
-#     params=params,
-#     cookies=cookies,
-#     headers=headers,
-#     json=json_data,
-# )
-#
-# response_data = json.loads(response.text)
-#
-# links = {}
-# for post in response_data["data"]["posts"]["data"]:
-#     hy_value = post["slug"]["hy"]
-#     link = f"https://banali.am/hy/{hy_value}"
-#     links[hy_value] = link
-#
-# for hy_value, link in links.items():
-#     print(link)
+from fake_useragent import UserAgent
 
 
 class FindingParseItemLinks():
@@ -98,15 +77,13 @@ class FindingParseItemLinks():
 
     def __init__(self):
         self.ua = UserAgent()
-
+        self.links = []
 
     def get_response(self, page):
         headers = {'User-Agent': self.ua.random}
-
         params = {
             'page': page,
         }
-
         response = requests.post(
             'https://banali.am/api/search/filter-posts',
             params=params,
@@ -116,15 +93,28 @@ class FindingParseItemLinks():
         )
         return response
 
-a = FindingParseItemLinks()
+    def __find_link_on_page(self, page):
+        response = self.get_response(page).text
+        response_data = json.loads(response)
 
-response_data = json.loads(a.get_response(1).text)
+        for post in response_data["data"]["posts"]["data"]:
+            hy_value = post["slug"]["hy"]
+            link = f"https://banali.am/hy/{hy_value}"
+            self.links.append(link)
 
-links = {}
-for post in response_data["data"]["posts"]["data"]:
-    hy_value = post["slug"]["hy"]
-    link = f"https://banali.am/hy/{hy_value}"
-    links[hy_value] = link
+    def find_all_links(self):
+        for i in range(677):
+            self.__find_link_on_page(i)
+            print(f'page - {i}')
 
-for hy_value, link in links.items():
-    print(link)
+    def links_to_json(self):
+        parsed_data = {'links': list(set(self.links))}
+        json_data = json.dumps(parsed_data, indent=4)
+        with open("links.json", "w") as json_file:
+            json_file.write(json_data)
+
+
+if __name__ == '__main__':
+    finder = FindingParseItemLinks()
+    finder.find_all_links()
+    finder.links_to_json()
