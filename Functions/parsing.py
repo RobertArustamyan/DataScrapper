@@ -1,10 +1,14 @@
 import json
-import concurrent.futures
+import time
+
 import requests
 from fake_useragent import UserAgent
 
 
 class FindingParseItemLinks():
+    '''
+    Class that represents house links parser
+    '''
     cookies = {
         '_gcl_au': '1.1.1578380407.1708608289',
         '_ym_uid': '1708608289339730971',
@@ -79,7 +83,12 @@ class FindingParseItemLinks():
         self.ua = UserAgent()
         self.links = []
 
-    def get_response(self, page):
+    def get_response(self, page: int) -> requests.Response:
+        '''
+        Send post method to Link and returns a response
+        :param page (int): The page number to request.
+        :return (requests.Response): The response object
+        '''
         headers = {'User-Agent': self.ua.random}
         params = {
             'page': page,
@@ -93,28 +102,49 @@ class FindingParseItemLinks():
         )
         return response
 
-    def __find_link_on_page(self, page):
-        response = self.get_response(page).text
-        response_data = json.loads(response)
+    def _find_link_on_page(self, page: int):
+        '''
+        Parses links on page
+        :param page(int): the number of page
+        :return: None if response.status_code != 200
+        '''
+        response = self.get_response(page)
+        if response.status_code == 200:
+            response_data = json.loads(response.text)
+        else:
+            print(f"Cannot get repsonse from page-{page}")
+            return
 
         for post in response_data["data"]["posts"]["data"]:
             hy_value = post["slug"]["hy"]
             link = f"https://banali.am/hy/{hy_value}"
             self.links.append(link)
+        print(f"Finished page - {page}")
 
-    def find_all_links(self):
-        for i in range(677):
-            self.__find_link_on_page(i)
-            print(f'page - {i}')
+    def find_all_links(self, times_to_repeat: int = 1) -> None:
+        '''
+        Finds all links from multiple pages and stores them in the links list.
+        :param times_to_repeat(int, optional): Number of times to repeat the process. Defaults to 1.
+        '''
+        while times_to_repeat:
+            for i in range(677):
+                self._find_link_on_page(i)
+                time.sleep(0.5)
+                if (i == 100 or i == 200 or i == 300 or i == 400 or i == 500 or i == 600):
+                    time.sleep(5)
+            times_to_repeat -= 1
 
     def links_to_json(self):
+        '''
+        Func that creates .json file of self.links list
+        '''
         parsed_data = {'links': list(set(self.links))}
         json_data = json.dumps(parsed_data, indent=4)
-        with open("links.json", "w") as json_file:
+        with open("links2.json", "w") as json_file:
             json_file.write(json_data)
 
 
 if __name__ == '__main__':
     finder = FindingParseItemLinks()
-    finder.find_all_links()
+    finder.find_all_links(2)
     finder.links_to_json()
