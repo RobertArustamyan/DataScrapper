@@ -1,7 +1,6 @@
-import pprint
-import requests
-from bs4 import BeautifulSoup
 import json
+
+import requests
 from fake_useragent import UserAgent
 
 
@@ -40,8 +39,10 @@ class GettingData():
         'x-requested-with': 'XMLHttpRequest',
         'x-xsrf-token': 'eyJpdiI6IkdjMFNMejNETitQSDJ4eFJSN2lqQ1E9PSIsInZhbHVlIjoiZXlzeXI3VjY3NnkxdFp4V1YzT0JqbFpuZnBQNE5FU0ZiV25sWUJMaDI2MU5zYjNhTXE5Ky9kRWIycGd5b1hCU2hTd2hobmRaSG1FbGxyRDB1amYxN1ZjR0RBWVJmbHBTcW93bFFIUlc5VUZKNXFJdU1tZmU3T0ZzTDFxc0lkcHEiLCJtYWMiOiIxZGQ3MmQ0NGVlMWQ4ZmFmMmJlYWE5YTU2ZjM1NTYxNzZjZjBkOWVjMjc0ODRmYWY4NGIwMDdkMjhlYjBkNGYzIiwidGFnIjoiIn0=',
     }
+
     def __init__(self):
         self.ua = UserAgent()
+        self.data = []
 
     def _get_response(self, url: str) -> str or None:
         '''
@@ -74,8 +75,41 @@ class GettingData():
             return json.loads(text)
         return None
 
-    def st(self, url):
-        return self._making_json(self._get_response(url))
+    def _getting_url_data(self, url: str) -> None:
+        pure_data = self._making_json(self._get_response(url))
+
+        if not pure_data:
+            return None
+
+        parsed_data = {}
+
+        parsed_data['link'] = url
+        parsed_data['category'] = pure_data['post']['deal']
+
+        parsed_data['address'] = pure_data['post']['location']['addressData']['address']
+        parsed_data['district'] = pure_data['post']['location']['addressData']['district']
+        parsed_data['state'] = pure_data['post']['location']['addressData']['state']
+        parsed_data['latitude'] = pure_data['post']['location']['location']['lat']
+        parsed_data['longtitude'] = pure_data['post']['location']['location']['lng']
+
+        parsed_data['animals'] = pure_data['post']['animals']
+
+        parsed_data['phone'] = pure_data['post']['contacts'][0]['formattedPhone']
+
+        parsed_data['dailyPriceFull'] = f"{pure_data['post']['dailyPriceFull'][0]['price']} - {pure_data['post']['dailyPriceFull'][0]['currency']}"
+        parsed_data['dailiPrice'] = pure_data['post']['daily_price']
+
+        parsed_data['description'] = pure_data['post']['description']
+
+        parsed_data['monthly_mortgage_amd'] = pure_data['post']['monthly_mortgage_amd']
+
+        self.data.append(parsed_data)
 
 if __name__ == "__main__":
     parser = GettingData()
+    parser._getting_url_data("https://banali.am/hy/vachark/bnakaran/1-senyakanoc/Ararat/Artashat/Araratyan-poxoc-B25706")
+    parser._getting_url_data("https://banali.am/hy/vachark/bnakaran/4-senyakanoc/Erevan/Avan/6-Almatii-poxoc-B20506")
+    parser._getting_url_data("https://banali.am/hy/vardzakalutyun/bnakaran/1-senyakanoc/Kotayq/Caxkadzor/Caxkadzor-B23574")
+    parser._getting_url_data("https://banali.am/hy/vardzakalutyun/bnakaran/3-senyakanoc/Erevan/Arabkir/Nikoxayos-Adonci-poxoc-B32579")
+    parser._getting_url_data("https://banali.am/hy/vachark/arandznatun/3-senyakanoc/Kotayq/Dzoraxbyur/Dzoraxbyur-H14879")
+    print(parser.data)
