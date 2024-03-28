@@ -129,7 +129,7 @@ class FindingSellParseItemLinks():
         for i in range(times_to_repeat * 1000):
             self._find_link_on_page(i)
             time.sleep(0.5)
-            if i%100 == 0:
+            if i % 100 == 0:
                 time.sleep(5)
 
     def _links_to_json(self, file_name: str):
@@ -141,9 +141,11 @@ class FindingSellParseItemLinks():
         json_data = json.dumps(parsed_data, indent=4)
         with open(f"../Data/{file_name}.json", "w") as json_file:
             json_file.write(json_data)
+
     def get_data_links(self, file_name: str, time_to_repeat: int = 1):
         self._find_all_links(time_to_repeat)
         self._links_to_json(file_name)
+
 
 class FindingRentParseItemLinks(FindingSellParseItemLinks):
     '''
@@ -223,6 +225,7 @@ class FindingRentParseItemLinks(FindingSellParseItemLinks):
     def __init__(self):
         super().__init__()
 
+
 if __name__ == '__main__':
     # Run code below to get sell data links!
     finder = FindingSellParseItemLinks()
@@ -231,6 +234,3 @@ if __name__ == '__main__':
     # Run code below to get rent data links!
     finder = FindingRentParseItemLinks()
     finder.get_data_links('RentLinks2', 1)
-
-
-
