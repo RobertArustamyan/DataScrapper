@@ -99,9 +99,34 @@ class GettingData():
         parsed_data['dailyPriceFull'] = f"{pure_data['post']['dailyPriceFull'][0]['price']} - {pure_data['post']['dailyPriceFull'][0]['currency']}"
         parsed_data['dailiPrice'] = pure_data['post']['daily_price']
 
-        parsed_data['description'] = pure_data['post']['description']
-
         parsed_data['monthly_mortgage_amd'] = pure_data['post']['monthly_mortgage_amd']
+        parsed_data['priceFull'] = f"{pure_data['post']['priceFull'][0]['price']} - {pure_data['post']['priceFull'][0]['currency']}"
+
+        parsed_data['propertyType'] = pure_data['post']['propertyType']
+
+        parsed_data['building_floors'] = pure_data['post']['sections']['about_building']['building_floors']
+        parsed_data['building_type'] = pure_data['post']['sections']['about_building']['building_type']
+        parsed_data['area'] = pure_data['post']['sections']['apartment_info'][0]['area']
+        parsed_data['bathrooms'] = pure_data['post']['sections']['apartment_info'][0]['bathrooms']
+        parsed_data['bedrooms'] = pure_data['post']['sections']['apartment_info'][0]['bedrooms']
+        parsed_data['area'] = pure_data['post']['sections']['apartment_info'][0]['area']
+        parsed_data['ceiling_height'] = pure_data['post']['sections']['apartment_info'][0]['ceiling_height']
+        parsed_data['cooling'] = pure_data['post']['sections']['apartment_info'][0]['cooling']
+        parsed_data['description_en'] = pure_data['post']['sections']['apartment_info'][0]['description_en']
+
+        try:
+            parsed_data['floor'] = pure_data['post']['sections']['apartment_info'][0]['floor']
+        except KeyError:
+            parsed_data['floor'] = None
+        parsed_data['renovation'] = pure_data['post']['sections']['apartment_info'][0]['renovation']
+        parsed_data['rooms'] = pure_data['post']['sections']['apartment_info'][0]['rooms']
+        parsed_data['sqm_price'] = pure_data['post']['sections']['apartment_info'][0]['sqm_price']
+
+        parsed_data['email'] = pure_data['post']['user']['email']
+        parsed_data['first_name'] = pure_data['post']['user']['first_name']
+        parsed_data['last_name'] = pure_data['post']['user']['last_name']
+        parsed_data['username'] = pure_data['post']['user']['username']
+
 
         self.data.append(parsed_data)
 
