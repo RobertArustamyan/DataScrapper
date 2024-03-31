@@ -1,8 +1,10 @@
 import json
+import random
 
 import requests
 from fake_useragent import UserAgent
 
+DRAM_TO_USD = 400
 
 class GettingData():
     cookies = {
@@ -76,81 +78,191 @@ class GettingData():
         return None
 
     def _getting_url_data(self, url: str) -> None:
+        '''
+        Gets all information out of link (category, price, area, floor and etc)
+        :param url: the link of the house
+        :return: appends the data in self.data
+        '''
         pure_data = self._making_json(self._get_response(url))
 
         if not pure_data:
             return None
 
-        # List of data per item
         parsed_data = {}
 
-        # Link of item
-        parsed_data['link'] = url
+        try:
+            parsed_data['link'] = url
+        except KeyError:
+            parsed_data['link'] = None
 
-        # Category (sell, rent)
-        parsed_data['category'] = pure_data['post']['deal']
+        try:
+            parsed_data['category'] = pure_data['post']['deal']
+        except KeyError:
+            parsed_data['category'] = None
 
-        # Address of item
-        parsed_data['address'] = pure_data['post']['location']['addressData']['address']
-        parsed_data['district'] = pure_data['post']['location']['addressData']['district']
-        # City of item
-        parsed_data['state'] = pure_data['post']['location']['addressData']['state']
+        try:
+            parsed_data['address'] = pure_data['post']['location']['addressData']['address']
+        except KeyError:
+            parsed_data['address'] = None
 
-        # Latitude and Longtitude
-        parsed_data['latitude'] = pure_data['post']['location']['location']['lat']
-        parsed_data['longtitude'] = pure_data['post']['location']['location']['lng']
+        try:
+            parsed_data['district'] = pure_data['post']['location']['addressData']['district']
+        except KeyError:
+            parsed_data['district'] = None
 
-        # Animals alowance
-        parsed_data['animals'] = pure_data['post']['animals']
+        try:
+            parsed_data['state'] = pure_data['post']['location']['addressData']['state']
+        except KeyError:
+            parsed_data['state'] = None
 
-        # Phone number
-        parsed_data['phone'] = pure_data['post']['contacts'][0]['formattedPhone']
+        try:
+            parsed_data['latitude'] = pure_data['post']['location']['location']['lat']
+        except KeyError:
+            parsed_data['latitude'] = None
 
-        # Price with its currency
-        parsed_data['dailyPriceFull'] = f"{pure_data['post']['dailyPriceFull'][0]['price']} - {pure_data['post']['dailyPriceFull'][0]['currency']}"
-        parsed_data['dailiPrice'] = pure_data['post']['daily_price']
+        try:
+            parsed_data['longitude'] = pure_data['post']['location']['location']['lng']
+        except KeyError:
+            parsed_data['longitude'] = None
 
-        parsed_data['monthly_mortgage_amd'] = pure_data['post']['monthly_mortgage_amd']
-        parsed_data[
-            'priceFull'] = f"{pure_data['post']['priceFull'][0]['price']} - {pure_data['post']['priceFull'][0]['currency']}"
+        try:
+            parsed_data['animals'] = pure_data['post']['animals']
+        except KeyError:
+            parsed_data['animals'] = None
 
-        parsed_data['propertyType'] = pure_data['post']['propertyType']
+        try:
+            parsed_data['phone'] = pure_data['post']['contacts'][0]['formattedPhone']
+        except KeyError:
+            parsed_data['phone'] = None
 
-        parsed_data['building_floors'] = pure_data['post']['sections']['about_building']['building_floors']
-        parsed_data['building_type'] = pure_data['post']['sections']['about_building']['building_type']
-        parsed_data['area'] = pure_data['post']['sections']['apartment_info'][0]['area']
-        parsed_data['bathrooms'] = pure_data['post']['sections']['apartment_info'][0]['bathrooms']
-        parsed_data['bedrooms'] = pure_data['post']['sections']['apartment_info'][0]['bedrooms']
-        parsed_data['area'] = pure_data['post']['sections']['apartment_info'][0]['area']
-        parsed_data['ceiling_height'] = pure_data['post']['sections']['apartment_info'][0]['ceiling_height']
-        parsed_data['cooling'] = pure_data['post']['sections']['apartment_info'][0]['cooling']
-        parsed_data['description_en'] = pure_data['post']['sections']['apartment_info'][0]['description_en']
+        try:
+            if pure_data['post']['dailyPriceFull'][0]['price'] and pure_data['post']['dailyPriceFull'][0]['currency'] == '051':
+                parsed_data['dailyPriceFull'] = float(pure_data['post']['dailyPriceFull'][0]['price']) / DRAM_TO_USD
+            elif pure_data['post']['dailyPriceFull'][0]['price']:
+                parsed_data['dailyPriceFull'] = float(pure_data['post']['dailyPriceFull'][0]['price'])
+            else:
+                parsed_data['dailyPriceFull'] = None
+        except (KeyError,TypeError):
+            parsed_data['dailyPriceFull'] = None
+
+        try:
+            parsed_data['dailiPrice'] = pure_data['post']['daily_price']
+        except KeyError:
+            parsed_data['dailiPrice'] = None
+
+        try:
+            parsed_data['monthly_mortgage_amd'] = pure_data['post']['monthly_mortgage_amd']
+        except KeyError:
+            parsed_data['monthly_mortgage_amd'] = None
+
+        try:
+            if pure_data['post']['priceFull'][0]['price'] and pure_data['post']['priceFull'][0]['currency'] == '051':
+                parsed_data['priceFull'] = float(pure_data['post']['priceFull'][0]['price']) /  DRAM_TO_USD
+            elif pure_data['post']['priceFull'][0]['price']:
+                parsed_data['priceFull'] = float(pure_data['post']['priceFull'][0]['price'])
+            else:
+                parsed_data['priceFull'] = None
+        except (KeyError,TypeError):
+            parsed_data['priceFull'] = None
+
+        try:
+            parsed_data['propertyType'] = pure_data['post']['propertyType']
+        except KeyError:
+            parsed_data['propertyType'] = None
+
+        try:
+            parsed_data['building_floors'] = pure_data['post']['sections']['about_building']['building_floors']
+        except KeyError:
+            parsed_data['building_floors'] = None
+
+        try:
+            parsed_data['building_type'] = pure_data['post']['sections']['about_building']['building_type']
+        except KeyError:
+            parsed_data['building_type'] = None
+
+        try:
+            parsed_data['area'] = pure_data['post']['sections']['apartment_info'][0]['area']
+        except KeyError:
+            parsed_data['area'] = None
+
+        try:
+            parsed_data['bathrooms'] = pure_data['post']['sections']['apartment_info'][0]['bathrooms']
+        except KeyError:
+            parsed_data['bathrooms'] = None
+
+        try:
+            parsed_data['bedrooms'] = pure_data['post']['sections']['apartment_info'][0]['bedrooms']
+        except KeyError:
+            parsed_data['bedrooms'] = None
+
+        try:
+            parsed_data['ceiling_height'] = pure_data['post']['sections']['apartment_info'][0]['ceiling_height']
+        except KeyError:
+            parsed_data['ceiling_height'] = None
+
+        try:
+            parsed_data['cooling'] = pure_data['post']['sections']['apartment_info'][0]['cooling']
+        except KeyError:
+            parsed_data['cooling'] = None
+
+        try:
+            parsed_data['description_en'] = pure_data['post']['sections']['apartment_info'][0]['description_en']
+        except KeyError:
+            parsed_data['description_en'] = None
 
         try:
             parsed_data['floor'] = pure_data['post']['sections']['apartment_info'][0]['floor']
         except KeyError:
             parsed_data['floor'] = None
-        parsed_data['renovation'] = pure_data['post']['sections']['apartment_info'][0]['renovation']
-        parsed_data['rooms'] = pure_data['post']['sections']['apartment_info'][0]['rooms']
-        parsed_data['sqm_price'] = pure_data['post']['sections']['apartment_info'][0]['sqm_price']
 
-        parsed_data['email'] = pure_data['post']['user']['email']
-        parsed_data['first_name'] = pure_data['post']['user']['first_name']
-        parsed_data['last_name'] = pure_data['post']['user']['last_name']
-        parsed_data['username'] = pure_data['post']['user']['username']
+        try:
+            parsed_data['renovation'] = pure_data['post']['sections']['apartment_info'][0]['renovation']
+        except KeyError:
+            parsed_data['renovation'] = None
+
+        try:
+            parsed_data['rooms'] = pure_data['post']['sections']['apartment_info'][0]['rooms']
+        except KeyError:
+            parsed_data['rooms'] = None
+
+        try:
+            parsed_data['sqm_price'] = pure_data['post']['sections']['apartment_info'][0]['sqm_price']
+        except KeyError:
+            parsed_data['sqm_price'] = None
+
+        try:
+            parsed_data['email'] = pure_data['post']['user']['email']
+        except KeyError:
+            parsed_data['email'] = None
+
+        try:
+            parsed_data['first_name'] = pure_data['post']['user']['first_name']
+        except KeyError:
+            parsed_data['first_name'] = None
+
+        try:
+            parsed_data['last_name'] = pure_data['post']['user']['last_name']
+        except KeyError:
+            parsed_data['last_name'] = None
+
+        try:
+            parsed_data['username'] = pure_data['post']['user']['username']
+        except KeyError:
+            parsed_data['username'] = None
 
         self.data.append(parsed_data)
 
 
 if __name__ == "__main__":
+    with open("../Data/CombinedRentLinks.json", 'r') as f:
+        data1 = json.load(f)
+    with open ("../Data/CombinedSellLinks.json", 'r') as f:
+        data2 = json.load(f)
+
+    data1.extend(data2)
+
     parser = GettingData()
-    parser._getting_url_data(
-        "https://banali.am/hy/vachark/bnakaran/1-senyakanoc/Ararat/Artashat/Araratyan-poxoc-B25706")
-    parser._getting_url_data("https://banali.am/hy/vachark/bnakaran/4-senyakanoc/Erevan/Avan/6-Almatii-poxoc-B20506")
-    parser._getting_url_data(
-        "https://banali.am/hy/vardzakalutyun/bnakaran/1-senyakanoc/Kotayq/Caxkadzor/Caxkadzor-B23574")
-    parser._getting_url_data(
-        "https://banali.am/hy/vardzakalutyun/bnakaran/3-senyakanoc/Erevan/Arabkir/Nikoxayos-Adonci-poxoc-B32579")
-    parser._getting_url_data(
-        "https://banali.am/hy/vachark/arandznatun/3-senyakanoc/Kotayq/Dzoraxbyur/Dzoraxbyur-H14879")
+    for i in range(20):
+        parser._getting_url_data(random.choice(data1))
+
     print(parser.data)
