@@ -81,11 +81,16 @@ class GettingData():
         if not pure_data:
             return None
 
+        # List of data per item
         parsed_data = {}
 
+        # Link of item
         parsed_data['link'] = url
+
+        # Category (sell, rent)
         parsed_data['category'] = pure_data['post']['deal']
 
+        # Address of item
         parsed_data['address'] = pure_data['post']['location']['addressData']['address']
         parsed_data['district'] = pure_data['post']['location']['addressData']['district']
         parsed_data['state'] = pure_data['post']['location']['addressData']['state']
