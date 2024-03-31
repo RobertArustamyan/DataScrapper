@@ -93,19 +93,26 @@ class GettingData():
         # Address of item
         parsed_data['address'] = pure_data['post']['location']['addressData']['address']
         parsed_data['district'] = pure_data['post']['location']['addressData']['district']
+        # City of item
         parsed_data['state'] = pure_data['post']['location']['addressData']['state']
+
+        # Latitude and Longtitude
         parsed_data['latitude'] = pure_data['post']['location']['location']['lat']
         parsed_data['longtitude'] = pure_data['post']['location']['location']['lng']
 
+        # Animals alowance
         parsed_data['animals'] = pure_data['post']['animals']
 
+        # Phone number
         parsed_data['phone'] = pure_data['post']['contacts'][0]['formattedPhone']
 
+        # Price with its currency
         parsed_data['dailyPriceFull'] = f"{pure_data['post']['dailyPriceFull'][0]['price']} - {pure_data['post']['dailyPriceFull'][0]['currency']}"
         parsed_data['dailiPrice'] = pure_data['post']['daily_price']
 
         parsed_data['monthly_mortgage_amd'] = pure_data['post']['monthly_mortgage_amd']
-        parsed_data['priceFull'] = f"{pure_data['post']['priceFull'][0]['price']} - {pure_data['post']['priceFull'][0]['currency']}"
+        parsed_data[
+            'priceFull'] = f"{pure_data['post']['priceFull'][0]['price']} - {pure_data['post']['priceFull'][0]['currency']}"
 
         parsed_data['propertyType'] = pure_data['post']['propertyType']
 
@@ -132,14 +139,18 @@ class GettingData():
         parsed_data['last_name'] = pure_data['post']['user']['last_name']
         parsed_data['username'] = pure_data['post']['user']['username']
 
-
         self.data.append(parsed_data)
+
 
 if __name__ == "__main__":
     parser = GettingData()
-    parser._getting_url_data("https://banali.am/hy/vachark/bnakaran/1-senyakanoc/Ararat/Artashat/Araratyan-poxoc-B25706")
+    parser._getting_url_data(
+        "https://banali.am/hy/vachark/bnakaran/1-senyakanoc/Ararat/Artashat/Araratyan-poxoc-B25706")
     parser._getting_url_data("https://banali.am/hy/vachark/bnakaran/4-senyakanoc/Erevan/Avan/6-Almatii-poxoc-B20506")
-    parser._getting_url_data("https://banali.am/hy/vardzakalutyun/bnakaran/1-senyakanoc/Kotayq/Caxkadzor/Caxkadzor-B23574")
-    parser._getting_url_data("https://banali.am/hy/vardzakalutyun/bnakaran/3-senyakanoc/Erevan/Arabkir/Nikoxayos-Adonci-poxoc-B32579")
-    parser._getting_url_data("https://banali.am/hy/vachark/arandznatun/3-senyakanoc/Kotayq/Dzoraxbyur/Dzoraxbyur-H14879")
+    parser._getting_url_data(
+        "https://banali.am/hy/vardzakalutyun/bnakaran/1-senyakanoc/Kotayq/Caxkadzor/Caxkadzor-B23574")
+    parser._getting_url_data(
+        "https://banali.am/hy/vardzakalutyun/bnakaran/3-senyakanoc/Erevan/Arabkir/Nikoxayos-Adonci-poxoc-B32579")
+    parser._getting_url_data(
+        "https://banali.am/hy/vachark/arandznatun/3-senyakanoc/Kotayq/Dzoraxbyur/Dzoraxbyur-H14879")
     print(parser.data)
