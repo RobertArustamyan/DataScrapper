@@ -1,11 +1,21 @@
 import json
 import random
-
+import concurrent.futures
 import requests
 from fake_useragent import UserAgent
+import csv
+import urllib3
+urllib3.disable_warnings()
 
 DRAM_TO_USD = 400
+proxies = [
+    'https://nTaBjw:oHWnkr@217.29.53.64:10776',
+    'https://nTaBjw:oHWnkr@217.29.53.64:10775',
+    'https://nTaBjw:oHWnkr@217.29.53.70:10801',
+    'https://nTaBjw:oHWnkr@217.29.53.70:10800',
+    'https://nTaBjw:oHWnkr@217.29.53.70:10799',
 
+]
 class GettingData():
     cookies = {
         '_gcl_au': '1.1.1578380407.1708608289',
@@ -56,12 +66,14 @@ class GettingData():
 
         # Removing "https://banali.am/hy/" from the URL
         shorted_url = url.replace("https://banali.am/hy/", "")
-
+        proxy = random.choice(proxies)
         # Making a GET request to the constructed URL
         response = requests.get(
             f'https://banali.am/api/post/slug/{shorted_url}',
             cookies=self.cookies,
             headers=self.headers,
+            verify=False,
+            proxies={'http': proxy}
         )
 
         # Returning the response text if the status code is 200, otherwise None
@@ -252,17 +264,26 @@ class GettingData():
 
         self.data.append(parsed_data)
 
+    def start_parse(self):
+        with open("../Data/CombinedRentLinks.json", 'r') as f:
+            data1 = json.load(f)
+        with open("../Data/CombinedSellLinks.json", 'r') as f:
+            data2 = json.load(f)
+        data1.extend(data2)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(self._getting_url_data, data1)
+
+        with open("../Data/result.csv", "w", newline="", encoding="utf-8") as csvfile:
+            fieldnames = list(self.data[0].keys()) if self.data else []
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            print(self.data)
+            writer.writerows(self.data)
 
 if __name__ == "__main__":
-    with open("../Data/CombinedRentLinks.json", 'r') as f:
-        data1 = json.load(f)
-    with open ("../Data/CombinedSellLinks.json", 'r') as f:
-        data2 = json.load(f)
 
-    data1.extend(data2)
-
+    # Creating GettingData class object
     parser = GettingData()
-    for i in range(20):
-        parser._getting_url_data(random.choice(data1))
-
-    print(parser.data)
+    # Start_parse starts parsing and returns result in result.csv file
+    parser.start_parse()
