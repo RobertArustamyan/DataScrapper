@@ -5,9 +5,12 @@ import requests
 from fake_useragent import UserAgent
 import csv
 import urllib3
+
 urllib3.disable_warnings()
 
 DRAM_TO_USD = 400
+
+# Add your proxies here in order not to get requests blocked!!
 proxies = [
     'https://nTaBjw:oHWnkr@217.29.53.64:10776',
     'https://nTaBjw:oHWnkr@217.29.53.64:10775',
@@ -265,6 +268,10 @@ class GettingData():
         self.data.append(parsed_data)
 
     def start_parse(self):
+        '''
+        Func that starts parsing
+        :return: makes .csv file with parsed information
+        '''
         with open("../Data/CombinedRentLinks.json", 'r') as f:
             data1 = json.load(f)
         with open("../Data/CombinedSellLinks.json", 'r') as f:
