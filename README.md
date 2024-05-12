@@ -2,7 +2,7 @@
 [![Pandas Version](https://img.shields.io/badge/Pandas-1.3.3-orange?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-This project is a Python-based web scraper designed to collect data from a real estate website, specifically for properties available for sale and rent. The scraper extracts various details about each property, such as category (sale or rent), address, price, area, floor, and more, and saves the data into a CSV file for further analysis.
+This project is a Python-based web scraper designed to collect and process data from a real estate website, specifically for properties available for sale and rent. The scraper extracts various details about each property, such as category (sale or rent), address, price, area, floor, and more, and saves the data into a CSV file for further analysis.
 
 ## Overview
 The scraper consists of several modules, each responsible for a specific task:
